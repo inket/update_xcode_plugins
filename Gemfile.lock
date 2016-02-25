@@ -1,0 +1,19 @@
+PATH
+  remote: .
+  specs:
+    update_xcode_plugins (0.1)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    rake (10.5.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rake
+  update_xcode_plugins!
+
+BUNDLED WITH
+   1.11.2
