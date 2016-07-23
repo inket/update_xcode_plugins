@@ -41,5 +41,12 @@ class PluginsUpdater
 
     separator
     success 'Finished! 🎉'
+
+    if xcodes.any? { |xcode| xcode.version.to_f >= 8 }
+      separator
+      warning 'It seems that you have Xcode >= 8 installed!'
+      puts 'Some plugins might not work on recent versions of Xcode because of library validation.',
+           "See #{'https://github.com/alcatraz/Alcatraz/issues/475'.underline}"
+    end
   end
 end
