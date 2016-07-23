@@ -2,46 +2,44 @@ require_relative 'xcode'
 require_relative 'xcode_plugin'
 
 class PluginsUpdater
+  extend CLI
+
   def self.update_plugins
     xcodes = Xcode.find_xcodes
 
     if xcodes.empty?
-      puts "Didn't find any Xcode installed on your system."
+      error "Didn't find any Xcode installed on your system."
       return
     else
-      puts 'Found:'
-      puts xcodes
+      title 'Found:'
+      puts xcodes.map { |s| "- #{s}" }
     end
 
-    puts separator
+    separator
 
     plugins = XcodePlugin.find_plugins
 
     if plugins.empty?
-      puts "Didn't find any Xcode Plug-in installed on your system."
+      error "Didn't find any Xcode Plug-in installed on your system."
       return
     else
-      puts 'Plugins:'
-      puts plugins
+      title 'Plugins:'
+      puts plugins.map { |s| "- #{s}" }
     end
 
-    puts separator
-    puts 'Updating...'
+    separator
+    process 'Updating...'
 
     uuids = xcodes.collect(&:uuid)
     uuids.each do |uuid|
       plugins.each do |plugin|
         if plugin.add_uuid(uuid) && !CLI.dry_run?
-          puts "Added #{uuid} to #{plugin}"
+          success "Added #{uuid} to #{plugin}"
         end
       end
     end
 
-    puts separator
-    puts 'Done.'
-  end
-
-  def self.separator
-    '-----------------------------------------------'
+    separator
+    success 'Finished! 🎉'
   end
 end
