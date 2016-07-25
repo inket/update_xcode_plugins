@@ -18,4 +18,5 @@ Gem::Specification.new do |s|
   s.license                   = 'MIT'
 
   spec.add_runtime_dependency 'colorize', '~> 0.8.1'
+  spec.add_runtime_dependency 'inquirer', '~> 0.2.1'
 end

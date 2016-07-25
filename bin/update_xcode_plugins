@@ -6,6 +6,8 @@ if CLI.uninstall_launch_agent?
   LaunchAgent.uninstall
 elsif CLI.install_launch_agent?
   LaunchAgent.install(__FILE__)
+elsif CLI.unsign_xcode?
+  XcodeUnsigner.unsign_xcode
 else
   PluginsUpdater.update_plugins
 end

@@ -11,6 +11,14 @@ module CLI
     ARGV.include?('--uninstall-launch-agent')
   end
 
+  def self.unsign_xcode?
+    ARGV.include?('--unsign')
+  end
+
+  def self.codesign_exists?
+    `which codesign` && $CHILD_STATUS.exitstatus == 0
+  end
+
   {
     title: :blue,
     process: :magenta,

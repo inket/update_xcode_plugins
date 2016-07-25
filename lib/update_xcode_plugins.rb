@@ -1,3 +1,7 @@
+require 'English'
+require 'fileutils'
 require 'colorize'
+require 'inquirer'
 require_relative 'plugins_updater'
+require_relative 'xcode_unsigner'
 require_relative 'launch_agent'

@@ -1,6 +1,8 @@
 require_relative 'bundle'
 
 class Xcode < Bundle
+  attr_accessor :signed
+
   def self.find_xcodes
     output = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode"`
     output.lines.collect do |xcode_path|
@@ -20,11 +22,47 @@ class Xcode < Bundle
     is_app && has_info
   end
 
+  def signed?
+    if signed.nil?
+      self.signed = `codesign -dv "#{path}" 2>/dev/null` &&
+                    $CHILD_STATUS.exitstatus == 0
+    end
+
+    signed
+  end
+
+  def unsign!
+    `#{unsign_path} "#{binary_path}"` &&
+      $CHILD_STATUS.exitstatus == 0 &&
+      File.exist?(unsigned_binary_path) &&
+      FileUtils.mv(unsigned_binary_path, binary_path)
+  end
+
   def uuid
     defaults_read('DVTPlugInCompatibilityUUID')
   end
 
   def to_s
-    "Xcode (#{version}) [#{uuid}]: #{path}"
+    unless signed.nil?
+      codesign_status = signed ? '[Signed]' : '[Unsigned]'
+    end
+
+    "Xcode (#{version}) [#{uuid}]#{codesign_status}: #{path}"
+  end
+
+  private
+
+  def binary_path
+    "#{path}/Contents/MacOS/Xcode"
+  end
+
+  def unsigned_binary_path
+    "#{binary_path}.unsigned"
+  end
+
+  def unsign_path
+    lib_path = File.expand_path(File.dirname(__FILE__))
+
+    "#{lib_path}/bin/unsign"
   end
 end
