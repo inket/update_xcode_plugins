@@ -1,14 +1,57 @@
 class LaunchAgent
+  extend CLI
+
   attr_accessor :bin_path
 
   def self.install(bin_path)
-    LaunchAgent.new(bin_path).install
-    puts 'Done.'
+    if !installed?
+      LaunchAgent.new(File.expand_path(bin_path)).install
+      success 'Installed! 🎉'
+    else
+      warning 'Launch agent is already installed!'
+    end
   end
 
   def self.uninstall
-    LaunchAgent.new.uninstall
-    puts 'Done.'
+    if installed?
+      LaunchAgent.new.uninstall
+      success 'Uninstalled! 🎉'
+    else
+      warning 'Launch agent is not installed!'
+    end
+  end
+
+  def self.update_if_stale(bin_path)
+    return unless stale?
+
+    launch_agent = LaunchAgent.new(File.expand_path(bin_path))
+    launch_agent.uninstall
+    launch_agent.install
+    success 'Updated launch agent.'
+  end
+
+  def self.stale?
+    if installed?
+      path = LaunchAgent.new.launch_agent_path
+
+      agent_xml = ''
+      File.open(path, 'r') do |file|
+        agent_xml = file.read
+      end
+
+      match = agent_xml.match(/update_xcode_plugins-(.*?)\//)
+      installed_version = match ? match[1] : nil
+
+      if installed_version && UpdateXcodePlugins::VERSION != installed_version
+        return true
+      end
+    end
+
+    false
+  end
+
+  def self.installed?
+    File.exist?(LaunchAgent.new.launch_agent_path)
   end
 
   def initialize(bin_path = nil)

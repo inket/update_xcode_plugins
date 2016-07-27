@@ -4,10 +4,14 @@ require_relative '../lib/update_xcode_plugins'
 
 if CLI.uninstall_launch_agent?
   LaunchAgent.uninstall
-elsif CLI.install_launch_agent?
-  LaunchAgent.install(__FILE__)
-elsif CLI.unsign_xcode?
-  XcodeUnsigner.unsign_xcode
 else
-  PluginsUpdater.update_plugins
+  LaunchAgent.update_if_stale(__FILE__)
+
+  if CLI.install_launch_agent?
+    LaunchAgent.install(__FILE__)
+  elsif CLI.unsign_xcode?
+    XcodeUnsigner.unsign_xcode
+  else
+    PluginsUpdater.update_plugins
+  end
 end
