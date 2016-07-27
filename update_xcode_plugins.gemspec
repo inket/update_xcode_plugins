@@ -17,6 +17,6 @@ Gem::Specification.new do |s|
   s.executables               = ['update_xcode_plugins']
   s.license                   = 'MIT'
 
-  spec.add_runtime_dependency 'colorize', '~> 0.8.1'
-  spec.add_runtime_dependency 'inquirer', '~> 0.2.1'
+  s.add_runtime_dependency 'colorize', '~> 0.8.1'
+  s.add_runtime_dependency 'inquirer', '~> 0.2.1'
 end
