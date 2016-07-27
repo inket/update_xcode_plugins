@@ -4,6 +4,8 @@ This tool adds the missing UUIDs into the installed Xcode plug-ins so that they 
 
 You can choose to run it once or install a **launch agent** that will trigger the tool every time any of your installed plugins are modified or Xcode/Xcode-beta gets updated.
 
+This tool also allows you to unsign Xcode in order to run plugins on Xcode 8 and later. For more information on why this is needed, see [alcatraz/Alcatraz#475](https://github.com/alcatraz/Alcatraz/issues/475).
+
 #### Install
 
 ```shell
@@ -20,19 +22,25 @@ In Terminal:
 $ update_xcode_plugins
 ```
 
-![](http://i.imgur.com/XQZHSND.png)
+![](http://i.imgur.com/0aw1bW4.png)
+
+To use plugins on Xcode 8 and later, unsign Xcode with:
+
+```shell
+$ update_xcode_plugins --unsign
+```
+
+![](http://i.imgur.com/3044DnB.png)
 
 ##### Other options
 
-For a dry run,
+For a dry run to see which plugins will be updated,
 
 ```shell
 $ update_xcode_plugins --dry-run
 ```
 
-![](http://i.imgur.com/SPdbt2V.png)
-
-To install the launch agent,
+To install the launch agent for automatically updating plugins,
 
 ```shell
 $ update_xcode_plugins --install-launch-agent
