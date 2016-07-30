@@ -2,6 +2,10 @@ require "minitest/autorun"
 require_relative "../lib/update_xcode_plugins"
 
 class TestXcode < Minitest::Test
+  def self.test_order
+    :alpha
+  end
+
   def skip_if_xcode_7
     skip "Unnecessary test for old Xcode version." if @xcode.version.to_f < 8
   end
