@@ -43,7 +43,7 @@ class TestXcode < Minitest::Test
     assert_equal true, @xcode.signed?
   end
 
-  def test_that_xcode_gets_unsigned_correctly
+  def test_that_xcode_is_unsigned_correctly
     skip_if_xcode_7
 
     @xcode.unsign_binary!
@@ -58,7 +58,7 @@ class TestXcode < Minitest::Test
     assert_equal true, is_signed
   end
 
-  def test_that_xcodebuild_gets_unsigned_correctly
+  def test_that_xcodebuild_is_unsigned_correctly
     skip_if_xcode_7
 
     @xcode.unsign_xcodebuild!
