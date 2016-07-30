@@ -2,6 +2,10 @@ require "minitest/autorun"
 require_relative "../lib/update_xcode_plugins"
 
 class TestXcode < Minitest::Test
+  def skip_if_xcode_7
+    skip "Unnecessary test for old Xcode version." if @xcode.version.to_f < 8
+  end
+
   def setup
     unless ENV["CI"] == "true" && ENV["TRAVIS"] == "true"
       warn "Tests should only be run on CI as they'll overwrite Xcode."
@@ -30,13 +34,32 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_xcode_is_signed_by_default
+    skip_if_xcode_7
+
     assert_equal true, @xcode.signed?
   end
 
   def test_that_xcode_gets_unsigned_correctly
-    return unless @xcode.version.to_f >= 8
+    skip_if_xcode_7
 
     @xcode.unsign_binary!
     assert_equal false, @xcode.signed?
+  end
+
+  def test_that_xcodebuild_is_signed_by_default
+    skip_if_xcode_7
+
+    is_signed = `codesign -dv "#{@xcode.send(:xcodebuild_path)}" 2>/dev/null` &&
+                  $CHILD_STATUS.exitstatus == 0
+    assert_equal true, is_signed
+  end
+
+  def test_that_xcodebuild_gets_unsigned_correctly
+    skip_if_xcode_7
+
+    @xcode.unsign_xcodebuild!
+    is_signed = `codesign -dv "#{@xcode.send(:xcodebuild_path)}" 2>/dev/null` &&
+                  $CHILD_STATUS.exitstatus == 0
+    assert_equal false, is_signed
   end
 end
