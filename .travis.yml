@@ -1,0 +1,8 @@
+language: objective-c
+osx_image: xcode8
+cache:
+  bundler: false
+script:
+  - rake test
+notifications:
+  email: false
