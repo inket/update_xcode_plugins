@@ -112,6 +112,8 @@ class TestXcode < Minitest::Test
   def test_that_uuid_is_added_correctly_to_test_plugin
     refute_nil @plugin
 
+    @plugin.add_uuid?(@xcode.uuid)
+
     plist_path = "#{@plugin.path}/Contents/Info"
     uuids = `defaults read "#{plist_path}" DVTPlugInCompatibilityUUIDs`.strip
 
