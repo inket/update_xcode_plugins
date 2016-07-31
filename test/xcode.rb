@@ -45,7 +45,7 @@ class TestXcode < Minitest::Test
   end
 
   def teardown
-    FileUtils.remove(plugin_injection_success_path)
+    FileUtils.remove(plugin_injection_success_path, force: true)
   end
 
   def test_that_xcode_has_correct_path
