@@ -45,7 +45,7 @@ class TestXcode < Minitest::Test
   end
 
   def teardown
-    File.remove(plugin_injection_success_path)
+    FileUtils.remove(plugin_injection_success_path)
   end
 
   def test_that_xcode_has_correct_path
@@ -120,7 +120,7 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_plugin_injects_into_xcodebuild_with_xcode7
-    skip if @xcode.version < 8
+    skip if @xcode.version.to_f < 8
 
     refute File.exist?(plugin_injection_success_path)
     `xcodebuild`
