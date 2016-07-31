@@ -112,7 +112,7 @@ class TestXcode < Minitest::Test
   def test_that_uuid_is_added_correctly_to_test_plugin
     refute_nil @plugin
 
-    @plugin.add_uuid?(@xcode.uuid)
+    @plugin.add_uuid(@xcode.uuid)
 
     plist_path = "#{@plugin.path}/Contents/Info"
     uuids = `defaults read "#{plist_path}" DVTPlugInCompatibilityUUIDs`.strip
@@ -122,7 +122,7 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_plugin_injects_into_xcodebuild_with_xcode7
-    skip if @xcode.version.to_f < 8
+    skip unless @xcode.version.to_f < 8
 
     refute File.exist?(plugin_injection_success_path)
     `xcodebuild`
