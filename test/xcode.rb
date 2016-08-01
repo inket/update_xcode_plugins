@@ -17,7 +17,10 @@ class TestXcode < Minitest::Test
       :test_that_plugin_doesnt_inject_into_xcodebuild_with_xcode8,
       :test_that_xcode_is_unsigned_correctly,
       :test_that_xcodebuild_is_unsigned_correctly,
-      :test_that_plugin_injects_into_xcodebuild_with_xcode8_after_unsign
+      :test_that_plugin_injects_into_xcodebuild_with_xcode8_after_unsign,
+      :test_that_launch_agent_is_installed_correctly,
+      :test_that_launch_agent_updates_plugins_when_plugins_are_changed,
+      :test_that_launch_agent_is_uninstalled_correctly
     ]
   end
 
@@ -42,6 +45,8 @@ class TestXcode < Minitest::Test
 
     @xcode = Xcode.from_bundle("/Applications/Xcode.app")
     @plugin = XcodePlugin.from_bundle(plugin_path)
+    @launch_agent =
+      LaunchAgent.new(File.expand_path("bin/update_xcode_plugins"))
   end
 
   def teardown
@@ -159,5 +164,39 @@ class TestXcode < Minitest::Test
     refute File.exist?(plugin_injection_success_path)
     `xcodebuild`
     assert File.exist?(plugin_injection_success_path)
+  end
+
+  def test_that_launch_agent_is_installed_correctly
+    refute File.exist?(@launch_agent.launch_agent_path)
+    launchctl_out = `launchctl list | grep #{@launch_agent.identifier} | wc -l`
+    refute launchctl_out.strip == "1"
+
+    @launch_agent.install
+
+    assert File.exist?(@launch_agent.launch_agent_path)
+    launchctl_out = `launchctl list | grep #{@launch_agent.identifier} | wc -l`
+    assert launchctl_out.strip == "1"
+  end
+
+  def test_that_launch_agent_updates_plugins_when_plugins_are_changed
+    FileUtils.remove(@plugin.path, force: true)
+    refute Dir.exist?(@plugin.path)
+
+    Dir.chdir("test/HelloWorld") { `xcodebuild` }
+    assert Dir.exist?(@plugin.path)
+
+    assert @plugin.has_uuid?(@xcode.uuid)
+  end
+
+  def test_that_launch_agent_is_uninstalled_correctly
+    assert File.exist?(@launch_agent.launch_agent_path)
+    launchctl_out = `launchctl list | grep #{@launch_agent.identifier} | wc -l`
+    assert launchctl_out.strip == "1"
+
+    @launch_agent.uninstall
+
+    refute File.exist?(@launch_agent.launch_agent_path)
+    launchctl_out = `launchctl list | grep #{@launch_agent.identifier} | wc -l`
+    refute launchctl_out.strip == "1"
   end
 end
