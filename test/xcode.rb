@@ -179,7 +179,7 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_launch_agent_updates_plugins_when_plugins_are_changed
-    FileUtils.remove(@plugin.path, force: true)
+    FileUtils.remove_dir(@plugin.path, true)
     refute Dir.exist?(@plugin.path)
 
     Dir.chdir("test/HelloWorld") { `xcodebuild` }
