@@ -17,7 +17,9 @@ class TestXcode < Minitest::Test
     )
   end
   let(:launch_agent) do
-    LaunchAgent.new(rvm_run("which update_xcode_plugins").strip)
+    LaunchAgent.new(
+      Gem.bin_path('update_xcode_plugins', 'update_xcode_plugins')
+    )
   end
 
   def self.runnable_methods
