@@ -18,7 +18,7 @@ class TestXcode < Minitest::Test
   end
   let(:launch_agent) do
     LaunchAgent.new(
-      Gem.bin_path('update_xcode_plugins', 'update_xcode_plugins')
+      Gem.bin_path("update_xcode_plugins", "update_xcode_plugins")
     )
   end
 
@@ -50,10 +50,6 @@ class TestXcode < Minitest::Test
 
   def plugin_injection_success_path
     "#{Dir.home}/Desktop/success"
-  end
-
-  def rvm_run(command)
-    `/bin/bash --login -c "rvm --nice use default && #{command}"`
   end
 
   def teardown
