@@ -190,7 +190,7 @@ class TestXcode < Minitest::Test
 
     puts `cat /tmp/#{launch_agent.identifier}.err`
     puts `cat /tmp/#{launch_agent.identifier}.out`
-    sleep 2
+    sleep 3
 
     assert plugin.has_uuid?(xcode.uuid)
   end
