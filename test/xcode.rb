@@ -188,7 +188,9 @@ class TestXcode < Minitest::Test
     Dir.chdir("test/HelloWorld") { `xcodebuild` }
     assert Dir.exist?(plugin.path)
 
-    sleep 1
+    puts `cat /tmp/#{launch_agent.identifier}.err`
+    puts `cat /tmp/#{launch_agent.identifier}.out`
+    sleep 2
 
     assert plugin.has_uuid?(xcode.uuid)
   end
