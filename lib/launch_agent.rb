@@ -106,6 +106,8 @@ class LaunchAgent
           <string>/usr/bin/env</string>
           <string>ruby</string>
           <string>#{bin_path}</string>
+          <string>--no-colors</string>
+          <string>--non-interactive</string>
         </array>
         <key>RunAtLoad</key>
         <false/>

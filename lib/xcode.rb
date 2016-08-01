@@ -31,11 +31,12 @@ class Xcode < Bundle
     signed
   end
 
-  def unsign!
-    `#{unsign_path} "#{binary_path}"` &&
-      $CHILD_STATUS.exitstatus == 0 &&
-      File.exist?(unsigned_binary_path) &&
-      FileUtils.mv(unsigned_binary_path, binary_path)
+  def unsign_binary!
+    unsign!(binary_path)
+  end
+
+  def unsign_xcodebuild!
+    unsign!(xcodebuild_path)
   end
 
   def uuid
@@ -56,13 +57,22 @@ class Xcode < Bundle
     "#{path}/Contents/MacOS/Xcode"
   end
 
-  def unsigned_binary_path
-    "#{binary_path}.unsigned"
+  def xcodebuild_path
+    "#{path}/Contents/Developer/usr/bin/xcodebuild"
   end
 
   def unsign_path
     lib_path = File.expand_path(File.dirname(__FILE__))
 
     "#{lib_path}/bin/unsign"
+  end
+
+  def unsign!(target)
+    unsigned_target = "#{target}.unsigned"
+
+    `#{unsign_path} "#{target}"` &&
+      $CHILD_STATUS.exitstatus == 0 &&
+      File.exist?(unsigned_target) &&
+      FileUtils.mv(unsigned_target, target)
   end
 end

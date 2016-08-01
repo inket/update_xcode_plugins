@@ -33,6 +33,8 @@ class XcodeUnsigner
 
     xcode = xcodes[selection - 1]
 
+    unsign_xcodebuild = Ask.confirm "Unsign xcodebuild too?"
+
     new_xcode_path = '/Applications/Xcode-unsigned.app'
     if Dir.exist?(new_xcode_path)
       error 'Xcode-unsigned.app already exists.'
@@ -44,7 +46,9 @@ class XcodeUnsigner
 
     process 'Unsigning...'
     new_xcode = Xcode.new(new_xcode_path)
-    if new_xcode.unsign!
+
+    if new_xcode.unsign_binary! &&
+       (!unsign_xcodebuild || (unsign_xcodebuild && new_xcode.unsign_xcodebuild!))
       success 'Finished! 🎉'
     else
       error "Could not unsign Xcode-unsigned.app\n"\

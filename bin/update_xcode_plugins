@@ -12,6 +12,13 @@ else
   elsif CLI.unsign_xcode?
     XcodeUnsigner.unsign_xcode
   else
+    if CLI.non_interactive?
+      # This tool is ran by launchctl whenever a plugin is added/modified,
+      # which presents a race condition if the plugin is still in the process
+      # of being modified. Counter that by sleeping for a few seconds.
+      sleep 2
+    end
+
     PluginsUpdater.update_plugins
   end
 end
