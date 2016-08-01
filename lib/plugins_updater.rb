@@ -42,6 +42,8 @@ class PluginsUpdater
     separator
     success 'Finished! 🎉'
 
+    return if CLI.no_colors?
+
     if xcodes.any? { |xcode| xcode.version.to_f >= 8 }
       separator
       warning 'It seems that you have Xcode 8+ installed!'
