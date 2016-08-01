@@ -45,8 +45,7 @@ class TestXcode < Minitest::Test
 
     @xcode = Xcode.from_bundle("/Applications/Xcode.app")
     @plugin = XcodePlugin.from_bundle(plugin_path)
-    @launch_agent =
-      LaunchAgent.new(File.expand_path("bin/update_xcode_plugins"))
+    @launch_agent = LaunchAgent.new(`which update_xcode_plugins`.strip)
   end
 
   def teardown
