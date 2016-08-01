@@ -9,8 +9,6 @@ end
 class TestXcode < Minitest::Test
   extend Minitest::Spec::DSL
 
-  @@install_gem = `rake`
-
   let(:xcode) { Xcode.new("/Applications/Xcode.app") }
   let(:plugin) do
     XcodePlugin.new(
