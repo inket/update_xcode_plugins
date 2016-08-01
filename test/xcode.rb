@@ -16,7 +16,9 @@ class TestXcode < Minitest::Test
       "/Plug-ins/HelloWorld.xcplugin"
     )
   end
-  let(:launch_agent) { LaunchAgent.new(`which update_xcode_plugins`.strip) }
+  let(:launch_agent) do
+    LaunchAgent.new(rvm_run("which update_xcode_plugins").strip)
+  end
 
   def self.runnable_methods
     [
@@ -46,6 +48,10 @@ class TestXcode < Minitest::Test
 
   def plugin_injection_success_path
     "#{Dir.home}/Desktop/success"
+  end
+
+  def rvm_run(command)
+    `/bin/bash --login -c "rvm use default && #{command}"`
   end
 
   def teardown
