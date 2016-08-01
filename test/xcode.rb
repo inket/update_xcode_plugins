@@ -51,7 +51,7 @@ class TestXcode < Minitest::Test
   end
 
   def rvm_run(command)
-    `/bin/bash --login -c "rvm use default && #{command}"`
+    `/bin/bash --login -c "rvm --nice use default && #{command}"`
   end
 
   def teardown
