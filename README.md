@@ -1,3 +1,5 @@
+![](https://travis-ci.org/inket/update_xcode_plugins.svg?branch=master)
+
 ### $ update\_xcode\_plugins
 
 This tool adds the missing UUIDs into the installed Xcode plug-ins so that they can be loaded by newer versions of Xcode.
