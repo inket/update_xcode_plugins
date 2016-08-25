@@ -3,9 +3,20 @@ require_relative 'bundle'
 class Xcode < Bundle
   attr_accessor :signed
 
+  # Hardcoded paths in case mdfind is not working because Spotlight is disabled
+  DEFAULT_XCODE_PATHS = [
+    "/Applications/Xcode.app",
+    "/Applications/Xcode-beta.app",
+    "/Applications/Xcode-unsigned.app"
+  ]
+
+  XCODE_BUNDLE_IDENTIFIER = "com.apple.dt.Xcode"
+
   def self.find_xcodes
-    output = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode"`
-    output.lines.collect do |xcode_path|
+    output = `mdfind kMDItemCFBundleIdentifier = "#{XCODE_BUNDLE_IDENTIFIER}"`
+    paths = output.lines + DEFAULT_XCODE_PATHS
+
+    paths.map(&:strip).uniq.collect do |xcode_path|
       Xcode.from_bundle(xcode_path)
     end.compact.keep_if(&:valid?)
   end
@@ -18,8 +29,9 @@ class Xcode < Bundle
   def valid?
     is_app = path.end_with?('.app')
     has_info = File.exist?(info_path)
+    return false unless is_app && has_info
 
-    is_app && has_info
+    bundle_identifier == XCODE_BUNDLE_IDENTIFIER
   end
 
   def signed?
