@@ -40,7 +40,10 @@ class TestXcode < Minitest::Test
       :test_that_plugin_injects_into_xcodebuild_with_xcode8_after_unsign,
       :test_that_launch_agent_is_installed_correctly,
       :test_that_launch_agent_updates_plugins_when_plugins_are_changed,
-      :test_that_launch_agent_is_uninstalled_correctly
+      :test_that_launch_agent_is_uninstalled_correctly,
+      :test_that_xcode_can_be_found_using_mdfind_with_spotlight_enabled,
+      :test_that_xcode_cannot_be_found_using_mdfind_with_spotlight_disabled,
+      :test_that_xcode_can_be_found_using_fallback_with_spotlight_disabled
     ]
   end
 
@@ -178,7 +181,7 @@ class TestXcode < Minitest::Test
 
     assert File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
-    assert launchctl_out.strip == "1"
+    assert_equal "1", launchctl_out.strip
   end
 
   def test_that_launch_agent_updates_plugins_when_plugins_are_changed
@@ -196,12 +199,30 @@ class TestXcode < Minitest::Test
   def test_that_launch_agent_is_uninstalled_correctly
     assert File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
-    assert launchctl_out.strip == "1"
+    assert_equal "1", launchctl_out.strip
 
     launch_agent.uninstall
 
     refute File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
-    refute launchctl_out.strip == "1"
+    assert_equal "0", launchctl_out.strip
+  end
+
+  def test_that_xcode_can_be_found_using_mdfind_with_spotlight_enabled
+    mdfind = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode" | wc -l`
+    assert_equal "1", mdfind.strip
+  end
+
+  def test_that_xcode_cannot_be_found_using_mdfind_with_spotlight_disabled
+    `sudo mdutil -a -i off`
+    mdfind = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode" | wc -l`
+    assert_equal "0", mdfind.strip
+  end
+
+  def test_that_xcode_can_be_found_using_fallback_with_spotlight_disabled
+    mdfind = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode" | wc -l`
+    assert_equal "0", mdfind.strip
+
+    refute Xcode.find_xcodes.empty?
   end
 end
