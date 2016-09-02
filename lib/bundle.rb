@@ -15,6 +15,10 @@ class Bundle
     "#{path}/Contents/Info.plist"
   end
 
+  def bundle_identifier
+    defaults_read("CFBundleIdentifier")
+  end
+
   def version
     defaults_read('CFBundleShortVersionString')
   end
