@@ -189,7 +189,7 @@ class TestXcode < Minitest::Test
     assert Dir.exist?(plugin.path)
 
     refute plugin.has_uuid?(xcode.uuid)
-    sleep 3
+    sleep 5
     assert plugin.has_uuid?(xcode.uuid)
   end
 
