@@ -54,6 +54,8 @@ or to uninstall the launch agent,
 $ update_xcode_plugins --uninstall-launch-agent
 ```
 
+and the last, open your spotlight and type Xcode-unsigned and press return
+
 #### Contact
 
 [@inket](https://github.com/inket) / [@inket](https://twitter.com/inket) on Twitter / [mahdi.jp](https://mahdi.jp)
