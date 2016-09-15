@@ -12,7 +12,11 @@ module CLI
   end
 
   def self.unsign_xcode?
-    ARGV.include?('--unsign')
+    ARGV.include?('--unsign') || ARGV.include?('--unsafe-unsign')
+  end
+
+  def self.unsafe_unsign_xcode?
+    ARGV.include?('--unsafe-unsign')
   end
 
   def self.no_colors?
