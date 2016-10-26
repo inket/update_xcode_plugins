@@ -2,11 +2,15 @@
 
 ### $ update\_xcode\_plugins
 
-This tool adds the missing UUIDs into the installed Xcode plug-ins so that they can be loaded by newer versions of Xcode.
+This tool adds the missing UUIDs into the installed Xcode plugins so that they can be loaded by newer versions of Xcode.
 
 You can choose to run it once or install a **launch agent** that will trigger the tool every time any of your installed plugins are modified or Xcode/Xcode-beta gets updated.
 
 This tool also allows you to unsign Xcode in order to run plugins on Xcode 8 and later. For more information on why this is needed, see [alcatraz/Alcatraz#475](https://github.com/alcatraz/Alcatraz/issues/475).
+
+When unsigning Xcode, you will also be prompted to unsign `xcodebuild`; Doing so will allow `xcodebuild` to load plugins and silence the library validation warnings. More info at [#8](https://github.com/inket/update_xcode_plugins/issues/8#issuecomment-247881598).
+
+If you are having any issues, please check [common issues](#common-issues) before creating an issue.
 
 #### Install
 
@@ -15,6 +19,8 @@ $ gem install update_xcode_plugins
 ```
 
 (if using system ruby: `sudo gem install update_xcode_plugins`)
+
+(if still having problems: `sudo gem install -n /usr/local/bin update_xcode_plugins` [#10](https://github.com/inket/update_xcode_plugins/issues/10))
 
 #### Usage
 
@@ -59,6 +65,12 @@ or to uninstall the launch agent,
 ```shell
 $ update_xcode_plugins --uninstall-launch-agent
 ```
+
+##### Common Issues
+
+###### Xcode crashes:
+
+  One or more of the plugins you are using are incompatible with your version of Xcode and are causing it to crash. The crash report will generally include the name of the responsible plugin. If unsure, start removing your plugins one by one until you find the culprit.
 
 #### Contact
 
