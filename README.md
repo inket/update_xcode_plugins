@@ -40,7 +40,7 @@ $ update_xcode_plugins --unsign
 
 ![](http://i.imgur.com/3044DnB.png)
 
-If you need to unsign without creating a copy of Xcode, at your own risk, use the command:
+If you need to unsign without creating a copy of Xcode, at your own risk, use the command (might need `sudo`):
 
 ```shell
 $ update_xcode_plugins --unsafe-unsign
