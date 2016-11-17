@@ -223,11 +223,11 @@ class TestXcode < Minitest::Test
     puts `mdfind -onlyin /Applications 'kMDItemKind = Application'`
     puts `sudo chown root:wheel /Applications/Xcode.app`
     puts "/Applications:"
-    puts `ls -la /Applications`
+    puts `ls -ale /Applications`
     puts "-"
     puts `mdfind -onlyin /Applications 'kMDItemKind = Application'`
     puts "-"
-    puts `ls -la /Volumes/xcodes`
+    puts `ls -ale /Volumes/xcodes`
 
     mdfind = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode" | wc -l`
     assert_equal "1", mdfind.strip
