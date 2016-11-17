@@ -41,7 +41,6 @@ class TestXcode < Minitest::Test
       :test_that_launch_agent_is_installed_correctly,
       :test_that_launch_agent_updates_plugins_when_plugins_are_changed,
       :test_that_launch_agent_is_uninstalled_correctly,
-      :test_that_xcode_can_be_found_using_mdfind_with_spotlight_enabled,
       :test_that_xcode_cannot_be_found_using_mdfind_with_spotlight_disabled,
       :test_that_xcode_can_be_found_using_fallback_with_spotlight_disabled
     ]
@@ -210,27 +209,6 @@ class TestXcode < Minitest::Test
     refute File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
     assert_equal "0", launchctl_out.strip
-  end
-
-  def test_that_xcode_can_be_found_using_mdfind_with_spotlight_enabled
-    puts "Spotlight result:"
-    puts `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode"`
-    puts "-"
-    puts `mdfind -onlyin /Applications -name Xcode`
-    puts "-"
-    puts `mdutil -sa`
-    puts "-"
-    puts `mdfind -onlyin /Applications 'kMDItemKind = Application'`
-    puts `sudo chown root:wheel /Applications/Xcode.app`
-    puts "/Applications:"
-    puts `ls -ale /Applications`
-    puts "-"
-    puts `mdfind -onlyin /Applications 'kMDItemKind = Application'`
-    puts "-"
-    puts `ls -ale /Volumes/xcodes`
-
-    mdfind = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode" | wc -l`
-    assert_equal "1", mdfind.strip
   end
 
   def test_that_xcode_cannot_be_found_using_mdfind_with_spotlight_disabled
