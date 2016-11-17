@@ -221,14 +221,13 @@ class TestXcode < Minitest::Test
     puts `mdutil -sa`
     puts "-"
     puts `mdfind -onlyin /Applications 'kMDItemKind = Application'`
-    puts "mdls:"
-    puts `mdls /Applications/Xcode.app`
-    puts "xattr:"
-    puts `xattr /Applications/Xcode.app`
+    puts `sudo chown root:wheel /Applications/Xcode.app`
     puts "/Applications:"
     puts `ls -la /Applications`
-    puts "Info.plist:"
-    puts `defaults read /Applications/Xcode.app/Contents/Info.plist`
+    puts "-"
+    puts `mdfind -onlyin /Applications 'kMDItemKind = Application'`
+    puts "-"
+    puts `ls -la /Volumes/xcodes`
 
     mdfind = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode" | wc -l`
     assert_equal "1", mdfind.strip
