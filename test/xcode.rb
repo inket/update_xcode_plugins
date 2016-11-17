@@ -213,6 +213,21 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_xcode_can_be_found_using_mdfind_with_spotlight_enabled
+    puts "Spotlight result:"
+    puts `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode"`
+    puts "-"
+    puts `mdfind -onlyin /Applications -name Xcode`
+    puts "-"
+    puts `mdutil -sa`
+    puts "-"
+    puts `mdfind -onlyin /Applications 'kMDItemKind = Application'`
+    puts "mdls:"
+    puts `mdls /Applications/Xcode.app`
+    puts "/Applications:"
+    puts `ls /Applications`
+    puts "Info.plist:"
+    puts `defaults read /Applications/Xcode.app/Contents/Info.plist`
+
     mdfind = `mdfind kMDItemCFBundleIdentifier = "com.apple.dt.Xcode" | wc -l`
     assert_equal "1", mdfind.strip
   end
