@@ -223,8 +223,10 @@ class TestXcode < Minitest::Test
     puts `mdfind -onlyin /Applications 'kMDItemKind = Application'`
     puts "mdls:"
     puts `mdls /Applications/Xcode.app`
+    puts "xattr:"
+    puts `xattr /Applications/Xcode.app`
     puts "/Applications:"
-    puts `ls /Applications`
+    puts `ls -la /Applications`
     puts "Info.plist:"
     puts `defaults read /Applications/Xcode.app/Contents/Info.plist`
 
