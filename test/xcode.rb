@@ -106,6 +106,7 @@ class TestXcode < Minitest::Test
     skip_if_xcode_7
 
     assert xcode.signed?
+    assert_equal "Xcode (#{xcode.version}) [#{xcode.uuid}][Signed]: #{xcode.path}", xcode.to_s
   end
 
   def test_that_xcodebuild_is_signed_by_default
@@ -177,6 +178,9 @@ class TestXcode < Minitest::Test
 
     xcode.unsign_binary!
     refute xcode.signed?
+
+    new_xcode = Xcode.new("/Applications/Xcode.app")
+    assert_equal "Xcode (#{xcode.version}) [#{xcode.uuid}][Unsigned]: #{xcode.path}", new_xcode.to_s
   end
 
   def test_that_xcodebuild_is_unsigned_correctly
