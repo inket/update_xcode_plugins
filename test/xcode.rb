@@ -180,6 +180,7 @@ class TestXcode < Minitest::Test
     refute xcode.signed?
 
     new_xcode = Xcode.new("/Applications/Xcode.app")
+    refute new_xcode.signed?
     assert_equal "Xcode (#{xcode.version}) [#{xcode.uuid}][Unsigned]: #{xcode.path}", new_xcode.to_s
   end
 
