@@ -201,6 +201,7 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_launch_agent_is_installed_correctly
+    refute LaunchAgent.installed?
     refute File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
     refute launchctl_out.strip == "1"
@@ -210,6 +211,11 @@ class TestXcode < Minitest::Test
     assert File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
     assert_equal "1", launchctl_out.strip
+    assert LaunchAgent.installed?
+  end
+
+  def test_that_launch_agent_is_not_stale
+    refute LaunchAgent.stale?
   end
 
   def test_that_launch_agent_updates_plugins_when_plugins_are_changed
@@ -234,6 +240,7 @@ class TestXcode < Minitest::Test
     refute File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
     assert_equal "0", launchctl_out.strip
+    refute LaunchAgent.installed?
   end
 
   def test_that_xcode_cannot_be_found_using_mdfind_with_spotlight_disabled
