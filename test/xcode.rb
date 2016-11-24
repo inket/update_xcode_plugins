@@ -41,6 +41,7 @@ class TestXcode < Minitest::Test
       :test_that_xcode_returns_correct_uuid,
       :test_that_xcode_is_signed_by_default,
       :test_that_xcodebuild_is_signed_by_default,
+      :test_that_test_plugin_is_invalid_when_nonexistent,
       :test_that_test_plugin_builds_correctly,
       :test_that_test_plugin_doesnt_include_uuid_by_default,
       :test_that_uuid_is_added_correctly_to_test_plugin,
@@ -115,6 +116,11 @@ class TestXcode < Minitest::Test
     assert is_signed
   end
 
+  def test_that_test_plugin_is_invalid_when_nonexistent
+    refute plugin.valid?
+    assert_nil XcodePlugin.from_bundle(plugin.path)
+  end
+
   def test_that_test_plugin_builds_correctly
     Dir.chdir("test/HelloWorld") do
       `xcodebuild`
@@ -122,6 +128,10 @@ class TestXcode < Minitest::Test
     end
 
     assert File.exist?(plugin.path)
+    assert plugin.valid?
+    refute_nil XcodePlugin.from_bundle(plugin.path)
+
+    assert_equal "HelloWorld (1.0)", plugin.to_s
   end
 
   def test_that_test_plugin_doesnt_include_uuid_by_default
