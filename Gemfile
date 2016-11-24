@@ -8,4 +8,3 @@ gem 'update_xcode_plugins', path: File.expand_path('..', __FILE__)
 gem 'rake'
 gem 'minitest'
 gem 'coveralls', require: false
-

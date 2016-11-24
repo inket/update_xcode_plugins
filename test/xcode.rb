@@ -1,5 +1,13 @@
-require 'coveralls'
-Coveralls.wear!
+require "simplecov"
+require "coveralls"
+
+SimpleCov.formatter = Coveralls::SimpleCov::Formatter
+SimpleCov.start do
+  # Ignore interactive scripts (and helper) that can't be tested
+  add_filter "lib/plugins_updater.rb"
+  add_filter "lib/xcode_unsigner.rb"
+  add_filter "lib/cli.rb"
+end
 
 require "minitest/autorun"
 require_relative "../lib/update_xcode_plugins"
