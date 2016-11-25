@@ -33,8 +33,10 @@ class TestXcode < Minitest::Test
     )
   end
 
+  # Test execution order needs to be set manually, which is why all tests are limited to one file
   def self.runnable_methods
     [
+      :test_that_bundle_cannot_be_used_directly,
       :test_that_xcode_has_correct_path,
       :test_that_xcode_bundle_is_valid,
       :test_that_xcode_has_correct_version,
@@ -44,12 +46,16 @@ class TestXcode < Minitest::Test
       :test_that_test_plugin_is_invalid_when_nonexistent,
       :test_that_test_plugin_builds_correctly,
       :test_that_test_plugin_doesnt_include_uuid_by_default,
+      :test_that_uuid_isnt_added_to_test_plugin_in_dry_run,
       :test_that_uuid_is_added_correctly_to_test_plugin,
       :test_that_plugin_injects_into_xcodebuild_with_xcode7,
       :test_that_plugin_doesnt_inject_into_xcodebuild_with_xcode8,
       :test_that_xcode_is_unsigned_correctly,
       :test_that_xcodebuild_is_unsigned_correctly,
       :test_that_plugin_injects_into_xcodebuild_with_xcode8_after_unsign,
+      :test_that_launch_agent_is_installed_correctly_via_cli,
+      :test_that_launch_agent_is_updated_correctly_via_cli,
+      :test_that_launch_agent_is_uninstalled_correctly_via_cli,
       :test_that_launch_agent_is_installed_correctly,
       :test_that_launch_agent_updates_plugins_when_plugins_are_changed,
       :test_that_launch_agent_is_uninstalled_correctly,
@@ -68,6 +74,10 @@ class TestXcode < Minitest::Test
 
   def teardown
     FileUtils.remove(plugin_injection_success_path, force: true)
+  end
+
+  def test_that_bundle_cannot_be_used_directly
+    refute Bundle.new("/Applications/Xcode.app").valid?
   end
 
   def test_that_xcode_has_correct_path
@@ -145,6 +155,16 @@ class TestXcode < Minitest::Test
     refute plugin.has_uuid?(xcode.uuid)
   end
 
+  def test_that_uuid_isnt_added_to_test_plugin_in_dry_run
+    refute_nil
+
+    CLI.stub :dry_run?, true do
+      plugin.add_uuid(xcode.uuid)
+    end
+
+    refute plugin.has_uuid?(xcode.uuid)
+  end
+
   def test_that_uuid_is_added_correctly_to_test_plugin
     refute_nil plugin
 
@@ -201,6 +221,33 @@ class TestXcode < Minitest::Test
     assert File.exist?(plugin_injection_success_path)
   end
 
+  def test_that_launch_agent_is_installed_correctly_via_cli
+    refute LaunchAgent.installed?
+
+    LaunchAgent.install("/some/random/path/update_xcode_plugins-0.0/bin/update_xcode_plugins")
+    assert LaunchAgent.installed?
+
+    # LaunchAgent should be stale because the version doesn't match
+    assert LaunchAgent.stale?
+  end
+
+  def test_that_launch_agent_is_updated_correctly_via_cli
+    assert LaunchAgent.installed?
+
+    LaunchAgent.update_if_stale(launch_agent.bin_path)
+    assert LaunchAgent.installed?
+
+    refute LaunchAgent.stale?
+  end
+
+  def test_that_launch_agent_is_uninstalled_correctly_via_cli
+    assert LaunchAgent.installed?
+
+    LaunchAgent.uninstall
+    refute LaunchAgent.installed?
+    refute LaunchAgent.stale?
+  end
+
   def test_that_launch_agent_is_installed_correctly
     refute LaunchAgent.installed?
     refute File.exist?(launch_agent.launch_agent_path)
@@ -213,9 +260,7 @@ class TestXcode < Minitest::Test
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
     assert_equal "1", launchctl_out.strip
     assert LaunchAgent.installed?
-  end
 
-  def test_that_launch_agent_is_not_stale
     refute LaunchAgent.stale?
   end
 
