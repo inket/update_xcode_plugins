@@ -1,4 +1,4 @@
-![](https://travis-ci.org/inket/update_xcode_plugins.svg?branch=master)
+![](https://travis-ci.org/inket/update_xcode_plugins.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/inket/update_xcode_plugins/badge.svg?branch=master)](https://coveralls.io/github/inket/update_xcode_plugins?branch=master)
 
 ### $ update\_xcode\_plugins
 
