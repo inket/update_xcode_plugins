@@ -44,7 +44,9 @@ class TestXcode < Minitest::Test
       :test_that_xcode_is_signed_by_default,
       :test_that_xcodebuild_is_signed_by_default,
       :test_that_test_plugin_is_invalid_when_nonexistent,
+      :test_that_find_plugins_returns_empty_array_when_no_plugins_are_installed,
       :test_that_test_plugin_builds_correctly,
+      :test_that_find_plugins_returns_installed_plugins,
       :test_that_test_plugin_doesnt_include_uuid_by_default,
       :test_that_uuid_isnt_added_to_test_plugin_in_dry_run,
       :test_that_uuid_is_added_correctly_to_test_plugin,
@@ -132,6 +134,10 @@ class TestXcode < Minitest::Test
     assert_nil XcodePlugin.from_bundle(plugin.path)
   end
 
+  def test_that_find_plugins_returns_empty_array_when_no_plugins_are_installed
+    assert_equal [], XcodePlugin.find_plugins
+  end
+
   def test_that_test_plugin_builds_correctly
     Dir.chdir("test/HelloWorld") do
       `xcodebuild`
@@ -143,6 +149,12 @@ class TestXcode < Minitest::Test
     refute_nil XcodePlugin.from_bundle(plugin.path)
 
     assert_equal "HelloWorld (1.0)", plugin.to_s
+  end
+
+  def test_that_find_plugins_returns_installed_plugins
+    found_plugins = XcodePlugin.find_plugins
+    assert_equal 1, found_plugins.count
+    assert_equal plugin.bundle_identifier, found_plugins.first.bundle_identifier
   end
 
   def test_that_test_plugin_doesnt_include_uuid_by_default
