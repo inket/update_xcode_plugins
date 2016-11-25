@@ -156,7 +156,7 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_uuid_isnt_added_to_test_plugin_in_dry_run
-    refute_nil
+    refute_nil plugin
 
     CLI.stub :dry_run?, true do
       plugin.add_uuid(xcode.uuid)
