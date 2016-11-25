@@ -1,3 +1,14 @@
+require "simplecov"
+require "coveralls"
+
+SimpleCov.formatter = Coveralls::SimpleCov::Formatter
+SimpleCov.start do
+  # Ignore interactive scripts (and helper) that can't be tested
+  add_filter "lib/plugins_updater.rb"
+  add_filter "lib/xcode_unsigner.rb"
+  add_filter "lib/cli.rb"
+end
+
 require "minitest/autorun"
 require_relative "../lib/update_xcode_plugins"
 
@@ -22,22 +33,31 @@ class TestXcode < Minitest::Test
     )
   end
 
+  # Test execution order needs to be set manually, which is why all tests are limited to one file
   def self.runnable_methods
     [
+      :test_that_bundle_cannot_be_used_directly,
       :test_that_xcode_has_correct_path,
       :test_that_xcode_bundle_is_valid,
       :test_that_xcode_has_correct_version,
       :test_that_xcode_returns_correct_uuid,
       :test_that_xcode_is_signed_by_default,
       :test_that_xcodebuild_is_signed_by_default,
+      :test_that_test_plugin_is_invalid_when_nonexistent,
+      :test_that_find_plugins_returns_empty_array_when_no_plugins_are_installed,
       :test_that_test_plugin_builds_correctly,
+      :test_that_find_plugins_returns_installed_plugins,
       :test_that_test_plugin_doesnt_include_uuid_by_default,
+      :test_that_uuid_isnt_added_to_test_plugin_in_dry_run,
       :test_that_uuid_is_added_correctly_to_test_plugin,
       :test_that_plugin_injects_into_xcodebuild_with_xcode7,
       :test_that_plugin_doesnt_inject_into_xcodebuild_with_xcode8,
       :test_that_xcode_is_unsigned_correctly,
       :test_that_xcodebuild_is_unsigned_correctly,
       :test_that_plugin_injects_into_xcodebuild_with_xcode8_after_unsign,
+      :test_that_launch_agent_is_installed_correctly_via_cli,
+      :test_that_launch_agent_is_updated_correctly_via_cli,
+      :test_that_launch_agent_is_uninstalled_correctly_via_cli,
       :test_that_launch_agent_is_installed_correctly,
       :test_that_launch_agent_updates_plugins_when_plugins_are_changed,
       :test_that_launch_agent_is_uninstalled_correctly,
@@ -56,6 +76,10 @@ class TestXcode < Minitest::Test
 
   def teardown
     FileUtils.remove(plugin_injection_success_path, force: true)
+  end
+
+  def test_that_bundle_cannot_be_used_directly
+    refute Bundle.new("/Applications/Xcode.app").valid?
   end
 
   def test_that_xcode_has_correct_path
@@ -94,6 +118,7 @@ class TestXcode < Minitest::Test
     skip_if_xcode_7
 
     assert xcode.signed?
+    assert_equal "Xcode (#{xcode.version}) [#{xcode.uuid}][Signed]: #{xcode.path}", xcode.to_s
   end
 
   def test_that_xcodebuild_is_signed_by_default
@@ -104,6 +129,15 @@ class TestXcode < Minitest::Test
     assert is_signed
   end
 
+  def test_that_test_plugin_is_invalid_when_nonexistent
+    refute plugin.valid?
+    assert_nil XcodePlugin.from_bundle(plugin.path)
+  end
+
+  def test_that_find_plugins_returns_empty_array_when_no_plugins_are_installed
+    assert_equal [], XcodePlugin.find_plugins
+  end
+
   def test_that_test_plugin_builds_correctly
     Dir.chdir("test/HelloWorld") do
       `xcodebuild`
@@ -111,6 +145,16 @@ class TestXcode < Minitest::Test
     end
 
     assert File.exist?(plugin.path)
+    assert plugin.valid?
+    refute_nil XcodePlugin.from_bundle(plugin.path)
+
+    assert_equal "HelloWorld (1.0)", plugin.to_s
+  end
+
+  def test_that_find_plugins_returns_installed_plugins
+    found_plugins = XcodePlugin.find_plugins
+    assert_equal 1, found_plugins.count
+    assert_equal plugin.bundle_identifier, found_plugins.first.bundle_identifier
   end
 
   def test_that_test_plugin_doesnt_include_uuid_by_default
@@ -120,6 +164,16 @@ class TestXcode < Minitest::Test
     uuids = `defaults read "#{plist_path}" DVTPlugInCompatibilityUUIDs`.strip
 
     assert_equal "(\n)", uuids
+    refute plugin.has_uuid?(xcode.uuid)
+  end
+
+  def test_that_uuid_isnt_added_to_test_plugin_in_dry_run
+    refute_nil plugin
+
+    CLI.stub :dry_run?, true do
+      plugin.add_uuid(xcode.uuid)
+    end
+
     refute plugin.has_uuid?(xcode.uuid)
   end
 
@@ -156,6 +210,10 @@ class TestXcode < Minitest::Test
 
     xcode.unsign_binary!
     refute xcode.signed?
+
+    new_xcode = Xcode.new("/Applications/Xcode.app")
+    refute new_xcode.signed?
+    assert_equal "Xcode (#{xcode.version}) [#{xcode.uuid}][Unsigned]: #{xcode.path}", new_xcode.to_s
   end
 
   def test_that_xcodebuild_is_unsigned_correctly
@@ -175,7 +233,53 @@ class TestXcode < Minitest::Test
     assert File.exist?(plugin_injection_success_path)
   end
 
+  def test_that_launch_agent_is_installed_correctly_via_cli
+    refute LaunchAgent.installed?
+
+    LaunchAgent.install("/some/random/path/update_xcode_plugins-0.0/bin/update_xcode_plugins")
+    assert LaunchAgent.installed?
+
+    # LaunchAgent should be stale because the version doesn't match
+    assert LaunchAgent.stale?
+
+    # Expect LaunchAgent.warning to be called because it's warning us about
+    # the plugin being already installed
+    mock = MiniTest::Mock.new
+    mock.expect(:call, nil, ["Launch agent is already installed!"])
+    LaunchAgent.stub(:warning, mock) do
+      LaunchAgent.install("")
+    end
+    mock.verify
+  end
+
+  def test_that_launch_agent_is_updated_correctly_via_cli
+    assert LaunchAgent.installed?
+
+    LaunchAgent.update_if_stale(launch_agent.bin_path)
+    assert LaunchAgent.installed?
+
+    refute LaunchAgent.stale?
+  end
+
+  def test_that_launch_agent_is_uninstalled_correctly_via_cli
+    assert LaunchAgent.installed?
+
+    LaunchAgent.uninstall
+    refute LaunchAgent.installed?
+    refute LaunchAgent.stale?
+
+    # Expect LaunchAgent.warning to be called because it's warning us about
+    # the plugin being already uninstalled
+    mock = MiniTest::Mock.new
+    mock.expect(:call, nil, ["Launch agent is not installed!"])
+    LaunchAgent.stub(:warning, mock) do
+      LaunchAgent.uninstall
+    end
+    mock.verify
+  end
+
   def test_that_launch_agent_is_installed_correctly
+    refute LaunchAgent.installed?
     refute File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
     refute launchctl_out.strip == "1"
@@ -185,6 +289,9 @@ class TestXcode < Minitest::Test
     assert File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
     assert_equal "1", launchctl_out.strip
+    assert LaunchAgent.installed?
+
+    refute LaunchAgent.stale?
   end
 
   def test_that_launch_agent_updates_plugins_when_plugins_are_changed
@@ -195,7 +302,7 @@ class TestXcode < Minitest::Test
     assert Dir.exist?(plugin.path)
 
     refute plugin.has_uuid?(xcode.uuid)
-    sleep 5
+    sleep 10
     assert plugin.has_uuid?(xcode.uuid)
   end
 
@@ -209,6 +316,7 @@ class TestXcode < Minitest::Test
     refute File.exist?(launch_agent.launch_agent_path)
     launchctl_out = `launchctl list | grep #{launch_agent.identifier} | wc -l`
     assert_equal "0", launchctl_out.strip
+    refute LaunchAgent.installed?
   end
 
   def test_that_xcode_cannot_be_found_using_mdfind_with_spotlight_disabled
