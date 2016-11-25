@@ -241,6 +241,15 @@ class TestXcode < Minitest::Test
 
     # LaunchAgent should be stale because the version doesn't match
     assert LaunchAgent.stale?
+
+    # Expect LaunchAgent.warning to be called because it's warning us about
+    # the plugin being already installed
+    mock = MiniTest::Mock.new
+    mock.expect(:call, nil)
+    LaunchAgent.stub(:warning, mock) do
+      LaunchAgent.install("")
+    end
+    mock.verify
   end
 
   def test_that_launch_agent_is_updated_correctly_via_cli
@@ -258,6 +267,15 @@ class TestXcode < Minitest::Test
     LaunchAgent.uninstall
     refute LaunchAgent.installed?
     refute LaunchAgent.stale?
+
+    # Expect LaunchAgent.warning to be called because it's warning us about
+    # the plugin being already uninstalled
+    mock = MiniTest::Mock.new
+    mock.expect(:call, nil)
+    LaunchAgent.stub(:warning, mock) do
+      LaunchAgent.uninstall
+    end
+    mock.verify
   end
 
   def test_that_launch_agent_is_installed_correctly
