@@ -245,7 +245,7 @@ class TestXcode < Minitest::Test
     # Expect LaunchAgent.warning to be called because it's warning us about
     # the plugin being already installed
     mock = MiniTest::Mock.new
-    mock.expect(:call, nil)
+    mock.expect(:call, nil, ["Launch agent is already installed!"])
     LaunchAgent.stub(:warning, mock) do
       LaunchAgent.install("")
     end
@@ -271,7 +271,7 @@ class TestXcode < Minitest::Test
     # Expect LaunchAgent.warning to be called because it's warning us about
     # the plugin being already uninstalled
     mock = MiniTest::Mock.new
-    mock.expect(:call, nil)
+    mock.expect(:call, nil, ["Launch agent is not installed!"])
     LaunchAgent.stub(:warning, mock) do
       LaunchAgent.uninstall
     end
