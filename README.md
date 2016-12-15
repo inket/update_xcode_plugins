@@ -40,12 +40,12 @@ To use plugins on Xcode 8 and later, unsign Xcode with:
 $ update_xcode_plugins --unsign
 ```
 
-![](http://i.imgur.com/3044DnB.png)
+![](http://i.imgur.com/XUco0su.png)
 
-If you need to unsign without creating a copy of Xcode, at your own risk, use the command (might need `sudo`):
+If you need to restore Xcode, use the command:
 
 ```shell
-$ update_xcode_plugins --unsafe-unsign
+$ update_xcode_plugins --restore
 ```
 
 ##### Other options
