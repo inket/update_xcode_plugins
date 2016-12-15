@@ -108,16 +108,12 @@ class Xcode < Bundle
     signed_target = "#{target}.signed"
 
     CLI.chown_if_required(File.dirname(target)) do
-      begin
-        `#{unsign_path} "#{target}"` &&
-          $CHILD_STATUS.exitstatus == 0
-          File.exist?(unsigned_target) &&
-          FileUtils.mv(target, signed_target) &&
-          File.exist?(signed_target) &&
-          FileUtils.mv(unsigned_target, target)
-      rescue
-        false
-      end
+      `#{unsign_path} "#{target}"` &&
+        $CHILD_STATUS.exitstatus == 0
+        File.exist?(unsigned_target) &&
+        FileUtils.mv(target, signed_target) &&
+        File.exist?(signed_target) &&
+        FileUtils.mv(unsigned_target, target)
     end
   end
 
@@ -125,13 +121,9 @@ class Xcode < Bundle
     signed_target = "#{target}.signed"
 
     CLI.chown_if_required(File.dirname(target)) do
-      begin
-        File.exist?(signed_target) &&
-          File.exist?(target) &&
-          FileUtils.mv(signed_target, target)
-      rescue
-        false
-      end
+      File.exist?(signed_target) &&
+        File.exist?(target) &&
+        FileUtils.mv(signed_target, target)
     end
   end
 end
