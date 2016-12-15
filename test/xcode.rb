@@ -41,6 +41,7 @@ class TestXcode < Minitest::Test
       :test_that_xcode_bundle_is_valid,
       :test_that_xcode_has_correct_version,
       :test_that_xcode_returns_correct_uuid,
+      :test_that_xcode_returns_appropriate_detailed_description,
       :test_that_xcode_is_signed_by_default,
       :test_that_xcodebuild_is_signed_by_default,
       :test_that_test_plugin_is_invalid_when_nonexistent,
@@ -114,6 +115,10 @@ class TestXcode < Minitest::Test
     refute_nil xcode.uuid
     refute_empty xcode.uuid
     assert xcode.uuid.match(/\A\h{8}-(?:\h{4}-){3}\h{12}\z/)
+  end
+
+  def test_that_xcode_returns_appropriate_detailed_description
+    assert_equal "Xcode (#{xcode.version}) [#{xcode.uuid}]: #{xcode.path}", xcode.detailed_description
   end
 
   def test_that_xcode_is_signed_by_default
