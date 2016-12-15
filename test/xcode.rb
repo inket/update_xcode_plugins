@@ -335,6 +335,8 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_xcode_is_restored_correctly
+    skip_if_xcode_7
+
     assert xcode.restorable?
     assert xcode.binary_restorable?
 
@@ -347,6 +349,8 @@ class TestXcode < Minitest::Test
   end
 
   def test_that_xcodebuild_is_restored_correctly
+    skip_if_xcode_7
+
     assert xcode.restorable?
     assert xcode.xcodebuild_restorable?
 
