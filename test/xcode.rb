@@ -62,7 +62,9 @@ class TestXcode < Minitest::Test
       :test_that_launch_agent_updates_plugins_when_plugins_are_changed,
       :test_that_launch_agent_is_uninstalled_correctly,
       :test_that_xcode_cannot_be_found_using_mdfind_with_spotlight_disabled,
-      :test_that_xcode_can_be_found_using_fallback_with_spotlight_disabled
+      :test_that_xcode_can_be_found_using_fallback_with_spotlight_disabled,
+      :test_that_xcode_is_restored_correctly,
+      :test_that_xcodebuild_is_restored_correctly
     ]
   end
 
@@ -330,5 +332,27 @@ class TestXcode < Minitest::Test
     assert_equal "0", mdfind.strip
 
     refute Xcode.find_xcodes.empty?
+  end
+
+  def test_that_xcode_is_restored_correctly
+    assert xcode.restorable?
+    assert xcode.binary_restorable?
+
+    refute xcode.signed?
+    assert xcode.restore_binary!
+    refute xcode.signed?
+
+    assert xcode.restorable? # xcodebuild is still unsigned
+    refute xcode.binary_restorable?
+  end
+
+  def test_that_xcodebuild_is_restored_correctly
+    assert xcode.restorable?
+    assert xcode.xcodebuild_restorable?
+
+    assert xcode.restore_xcodebuild!
+
+    refute xcode.restorable?
+    refute xcode.xcodebuild_restorable?
   end
 end
