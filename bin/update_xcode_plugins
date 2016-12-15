@@ -2,23 +2,28 @@
 
 require_relative '../lib/update_xcode_plugins'
 
-if CLI.uninstall_launch_agent?
-  LaunchAgent.uninstall
-else
-  LaunchAgent.update_if_stale(__FILE__)
-
-  if CLI.install_launch_agent?
-    LaunchAgent.install(__FILE__)
-  elsif CLI.unsign_xcode?
-    XcodeUnsigner.unsign_xcode
+begin
+  if CLI.uninstall_launch_agent?
+    LaunchAgent.uninstall
   else
-    if CLI.non_interactive?
-      # This tool is ran by launchctl whenever a plugin is added/modified,
-      # which presents a race condition if the plugin is still in the process
-      # of being modified. Counter that by sleeping for a few seconds.
-      sleep 2
-    end
+    LaunchAgent.update_if_stale(__FILE__)
 
-    PluginsUpdater.update_plugins
+    if CLI.install_launch_agent?
+      LaunchAgent.install(__FILE__)
+    elsif CLI.unsign_xcode?
+      XcodeUnsigner.unsign_xcode
+    elsif CLI.restore_xcode?
+      XcodeUnsigner.restore_xcode
+    else
+      if CLI.non_interactive?
+        # This tool is ran by launchctl whenever a plugin is added/modified,
+        # which presents a race condition if the plugin is still in the process
+        # of being modified. Counter that by sleeping for a few seconds.
+        sleep 2
+      end
+
+      PluginsUpdater.update_plugins
+    end
   end
+rescue Interrupt
 end
