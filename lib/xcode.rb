@@ -43,6 +43,18 @@ class Xcode < Bundle
     signed
   end
 
+  def restorable?
+    binary_restorable? || xcodebuild_restorable?
+  end
+
+  def binary_restorable?
+    File.exist?("#{binary_path}.signed")
+  end
+
+  def xcodebuild_restorable?
+    File.exist?("#{xcodebuild_path}.signed")
+  end
+
   def unsign_binary!
     unsign!(binary_path)
   end
@@ -51,16 +63,28 @@ class Xcode < Bundle
     unsign!(xcodebuild_path)
   end
 
+  def restore_binary!
+    restore!(binary_path)
+  end
+
+  def restore_xcodebuild!
+    restore!(xcodebuild_path)
+  end
+
   def uuid
     defaults_read('DVTPlugInCompatibilityUUID')
   end
 
   def to_s
     unless signed.nil?
-      codesign_status = signed ? '[Signed]' : '[Unsigned]'
+      codesign_status = signed ? ' [Signed]' : ' [Unsigned]'
     end
 
-    "Xcode (#{version}) [#{uuid}]#{codesign_status}: #{path}"
+    "Xcode (#{version})#{codesign_status}: #{path}"
+  end
+
+  def detailed_description
+    "Xcode (#{version}) [#{uuid}]: #{path}"
   end
 
   private
@@ -81,10 +105,33 @@ class Xcode < Bundle
 
   def unsign!(target)
     unsigned_target = "#{target}.unsigned"
+    signed_target = "#{target}.signed"
 
-    `#{unsign_path} "#{target}"` &&
-      $CHILD_STATUS.exitstatus == 0 &&
-      File.exist?(unsigned_target) &&
-      FileUtils.mv(unsigned_target, target)
+    CLI.chown_if_required(File.dirname(target)) do
+      begin
+        `#{unsign_path} "#{target}"` &&
+          $CHILD_STATUS.exitstatus == 0
+          File.exist?(unsigned_target) &&
+          FileUtils.mv(target, signed_target) &&
+          File.exist?(signed_target) &&
+          FileUtils.mv(unsigned_target, target)
+      rescue
+        false
+      end
+    end
+  end
+
+  def restore!(target)
+    signed_target = "#{target}.signed"
+
+    CLI.chown_if_required(File.dirname(target)) do
+      begin
+        File.exist?(signed_target) &&
+          File.exist?(target) &&
+          FileUtils.mv(signed_target, target)
+      rescue
+        false
+      end
+    end
   end
 end

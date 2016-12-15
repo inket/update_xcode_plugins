@@ -12,11 +12,11 @@ module CLI
   end
 
   def self.unsign_xcode?
-    ARGV.include?('--unsign') || ARGV.include?('--unsafe-unsign')
+    ARGV.include?('--unsign')
   end
 
-  def self.unsafe_unsign_xcode?
-    ARGV.include?('--unsafe-unsign')
+  def self.restore_xcode?
+    ARGV.include?('--restore')
   end
 
   def self.no_colors?
@@ -31,9 +31,27 @@ module CLI
     `which codesign` && $CHILD_STATUS.exitstatus == 0
   end
 
+  def self.chown_if_required(path)
+    return yield if File.owned?(path)
+
+    puts
+    puts "* Changing ownership of #{path} (will be restored after)".colorize(:light_blue)
+
+    previous_owner = File.stat(path).uid
+    system("sudo chown $(whoami) \"#{path}\"")
+
+    raise "Could not change ownership of #{path}" unless File.owned?(path)
+
+    result = yield
+    system("sudo chown #{previous_owner} \"#{path}\"")
+    puts "* Restored ownership of #{path}".colorize(:light_blue)
+
+    result
+  end
+
   {
     title: :blue,
-    process: :magenta,
+    process: :light_blue,
     warning: :yellow,
     error: :red,
     success: :green

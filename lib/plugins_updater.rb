@@ -12,7 +12,7 @@ class PluginsUpdater
       return
     else
       title 'Found:'
-      puts xcodes.map { |s| "- #{s}" }
+      puts xcodes.map { |xcode| "- #{xcode.detailed_description}" }
     end
 
     separator
