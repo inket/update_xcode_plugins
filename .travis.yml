@@ -1,6 +1,9 @@
 matrix:
   include:
     - os: osx
+      osx_image: xcode8.3
+      env: TRAVIS_XCODE_VERSION=83
+    - os: osx
       osx_image: xcode8.2
       env: TRAVIS_XCODE_VERSION=82
     - os: osx
