@@ -103,7 +103,7 @@ class TestXcode < Minitest::Test
     elsif ENV["TRAVIS_XCODE_VERSION"] == "82"
       assert_equal "8.2", xcode.version
     elsif ENV["TRAVIS_XCODE_VERSION"] == "83"
-      assert_equal "8.3", xcode.version
+      assert xcode.version.start_with?("8.3")
     else
       fail "Unexpected Xcode version #{xcode.version}"
     end
