@@ -1,6 +1,6 @@
 [![](https://travis-ci.org/inket/update_xcode_plugins.svg?branch=master)](https://travis-ci.org/inket/update_xcode_plugins) [![Coverage Status](https://coveralls.io/repos/github/inket/update_xcode_plugins/badge.svg?branch=master)](https://coveralls.io/github/inket/update_xcode_plugins?branch=master)
 
-![](https://img.shields.io/badge/xcode%207.3-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%208.0-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%208.1-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%208.2-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%208.3-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%209.0%20beta-supported-green.svg)
+![](https://img.shields.io/badge/xcode%207.3-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%208.0-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%208.1-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%208.2-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%208.3-supported-brightgreen.svg) ![](https://img.shields.io/badge/xcode%209.0-supported-brightgreen.svg)
 
 ### $ update\_xcode\_plugins
 
