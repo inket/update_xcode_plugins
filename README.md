@@ -11,6 +11,9 @@
 ![](https://img.shields.io/badge/xcode%209.1-supported-brightgreen.svg)
 ![](https://img.shields.io/badge/xcode%209.2-supported-brightgreen.svg)
 ![](https://img.shields.io/badge/xcode%209.3-supported-brightgreen.svg)
+![](https://img.shields.io/badge/xcode%209.4-supported-brightgreen.svg)
+
+![](https://img.shields.io/badge/xcode%2010.0b1-supported-brightgreen.svg)
 
 ### $ update\_xcode\_plugins
 
